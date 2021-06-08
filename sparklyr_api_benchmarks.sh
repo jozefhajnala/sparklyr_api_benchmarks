@@ -75,7 +75,24 @@ print(mb, signif = 3)
 " > ./bench.R
 
 
-## Install Latest package versions ----------------------------------
+
+## Install 2021-04-01 package versions (sparklyr 1.6.2) -------------
+echo "
+rp <- 'https://mran.microsoft.com/snapshot/2021-04-01'
+options(repos = rp, Ncpus = parallel::detectCores())
+pkgs <- c(
+  'remotes',
+  'dplyr',
+  'dbplyr',
+  'tidyr',
+  'sparklyr',
+  'DBI'
+)
+message('Installing packages: ', toString(pkgs))
+install.packages(pkgs, quiet = TRUE)
+" > ./upgrade_2021_04_01.R
+
+## Install Latest CRAN package versions -----------------------------
 echo "
 rp <- 'https://packagemanager.rstudio.com/all/__linux__/focal/latest'
 options(repos = rp, Ncpus = parallel::detectCores())
@@ -109,6 +126,16 @@ docker run --rm \
   jozefhajnala/jozefio \
   /bin/bash -c "set -e; Rscript /bench.R"
 
+
+## CRAN as of 2021-04-01 --------------------------------------------
+echo "\n\n===== CRAN as of 2021-04-01 ====="
+docker run --rm \
+  -v $(pwd)/bench.R:/bench.R \
+  -v $(pwd)/upgrade_2021_04_01.R:/upgrade_2021_04_01.R \
+  jozefhajnala/jozefio \
+  /bin/bash -c "set -e; Rscript /upgrade_2021_04_01.R; Rscript /bench.R"
+
+
 ## Current CRAN -----------------------------------------------------
 echo "\n\n===== Current CRAN package versions ====="
 docker run --rm \
@@ -131,3 +158,4 @@ docker run --rm \
 rm ./bench.R
 rm ./upgrade.R
 rm ./devsparklyr.R
+rm ./upgrade_2021_04_01.R
